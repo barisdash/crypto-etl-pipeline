@@ -1,23 +1,27 @@
+import os
 import requests
 import logging
+from dotenv import load_dotenv
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+load_dotenv()
 
 def fetch_crypto_data():
     """Fetches live market data from CoinGecko API."""
-    url = "https://api.coingecko.com/api/v3/coins/markets"
+    url = os.getenv("COINGECKO_API_URL")
     params = {
         "vs_currency": "usd",
         "ids": "bitcoin,ethereum,cardano,solana",
         "order": "market_cap_desc"
     }
+    
     try:
-        logging.info("Fetching data from API...")
+        logging.info("Requesting data from CoinGecko API...")
         response = requests.get(url, params=params)
-        response.raise_for_status()
+        response.raise_for_status() 
+        
         data = response.json()
-        logging.info(f"Successfully retrieved {len(data)} records.")
+        logging.info(f"Successfully retrieved {len(data)} coin records.")
         return data
     except Exception as e:
-        logging.error(f"API Error: {e}")
+        logging.error(f"API Ingestion Error: {e}")
         return None
